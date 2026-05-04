@@ -26,27 +26,9 @@ app.post("/create-checkout-session", async (req, res) => {
       return res.status(400).json({ error: "Montant invalide" });
     }
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      customer_email: email || undefined,
-      line_items: [
-        {
-          price_data: {
-            currency: "cad",
-            product_data: {
-              name: "Inscription camp Centre Sportif Dorg",
-              description: parentName || "Inscription camp"
-            },
-            unit_amount: amountInCents
-          },
-          quantity: 1
-        }
-      ],
-      success_url: "https://centresportifdorg.carrd.co?payment=success",
-      cancel_url: "https://centresportifdorg.carrd.co?payment=cancel"
-    });
-
-    res.json({ url: session.url });
+    return res.json({
+  url: "https://youtube.com"
+});
   } catch (error) {
     console.error("Stripe error:", error);
     res.status(500).json({ error: "Erreur lors de la création du paiement" });
