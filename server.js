@@ -21,11 +21,23 @@ app.post("/create-checkout-session", async (req, res) => {
   try {
     const { amount, email, parentName, plan } = req.body;
 
-    const amountInCents = Math.round(Number(amount) * 100);
+    let originalAmount = Number(amount);
+    let amountToCharge = originalAmount;
+    let paymentDescription = "Paiement complet";
 
-    if (!amountInCents || amountInCents < 100) {
+    if (!originalAmount || originalAmount < 1) {
       return res.status(400).json({ error: "Montant invalide" });
     }
+
+    if (plan && plan.includes("4")) {
+      amountToCharge = originalAmount * 0.25;
+      paymentDescription = "Premier versement sur 4";
+    } else if (plan && plan.includes("2")) {
+      amountToCharge = originalAmount * 0.5;
+      paymentDescription = "Premier versement sur 2";
+    }
+
+    const amountInCents = Math.round(amountToCharge * 100);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -36,7 +48,7 @@ app.post("/create-checkout-session", async (req, res) => {
             currency: "cad",
             product_data: {
               name: "Inscription camp Centre Sportif Dorg",
-              description: plan || "Paiement complet"
+              description: paymentDescription
             },
             unit_amount: amountInCents
           },
@@ -46,7 +58,9 @@ app.post("/create-checkout-session", async (req, res) => {
       metadata: {
         parentName: parentName || "",
         plan: plan || "Paiement complet",
-        totalAmount: String(amount)
+        totalOriginal: String(originalAmount),
+        amountChargedNow: String(amountToCharge),
+        paymentDescription
       },
       success_url: "https://centresportifdorg.carrd.co/?payment=success",
       cancel_url: "https://centresportifdorg.carrd.co/?payment=cancel"
