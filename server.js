@@ -8,7 +8,7 @@ const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 app.use(cors({
-  origin: "https://centresportifdorg.carrd.co"
+  origin: "https://centresportifdorg.com"
 }));
 
 app.use(express.json());
@@ -62,8 +62,8 @@ app.post("/create-checkout-session", async (req, res) => {
         amountChargedNow: String(amountToCharge),
         paymentDescription
       },
-      success_url: "https://centresportifdorg.carrd.co/?payment=success",
-      cancel_url: "https://centresportifdorg.carrd.co/?payment=cancel"
+      success_url: "https://centresportifdorg.com/?payment=success",
+      cancel_url: "https://centresportifdorg.com.co/?payment=cancel"
     });
 
     res.json({ url: session.url });
